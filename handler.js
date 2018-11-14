@@ -1,7 +1,8 @@
 'use strict';
 
-const {getPage, parsePage, saveRatingsToDB} = require('./utils');
+const {getPage, parsePage, saveRatingsToDB, deployScrapers} = require('./utils');
 
+//sls invoke local -f scrape -d "pho-ha-philadelphia"
 module.exports.scrape = async (event, context) => {
   //1. Fetch yelp page
   getPage(event)
@@ -21,4 +22,20 @@ module.exports.scrape = async (event, context) => {
     .catch(err => new Error(`Error scraping: ${JSON.stringify(err)}`))
 };
 
-//sls invoke local -f scrape -d "pho-ha-philadelphia"
+
+
+module.exports.launch_scrapers = async (event, context) => {
+  //list of business names
+  const listOfBusiness = [
+    "Harper’s Garden",
+    "R&D",
+    "Bok Bar",
+    "Dim Sum & Noodle",
+    "Xiandu Thai"
+  ];
+
+  //launch a lambda function for each business name
+  listOfBusiness.forEach(businessName => {
+    deployScrapers(businessName);
+  })
+};
